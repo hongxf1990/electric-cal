@@ -1,4 +1,4 @@
-package com.zer.electric.utils;
+package com.zer.electric.utils.Mysql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
