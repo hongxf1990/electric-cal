@@ -1,9 +1,5 @@
 package com.zer.electric.bean;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import java.util.Date;
-
 /**
  * @author zer
  * @create 2016-11-28 15:31
@@ -13,10 +9,9 @@ public class ElectricNumBean {
     private Double wc;
     private Double jx;
     private Double pub;
-    private Double totalOfBill;
+    private Double totalOfElec;
 
-    @JsonFormat(pattern="MM/yyyy", timezone="Asia/Shanghai")
-    private Date createTime;
+    private String time;
 
     public Double getHxf() {
         return hxf;
@@ -50,19 +45,19 @@ public class ElectricNumBean {
         this.pub = pub;
     }
 
-    public Double getTotalOfBill() {
-        return totalOfBill;
+    public Double getTotalOfElec() {
+        return totalOfElec;
     }
 
-    public void setTotalOfBill(Double totalOfBill) {
-        this.totalOfBill = totalOfBill;
+    public void setTotalOfElec(Double totalOfElec) {
+        this.totalOfElec = totalOfElec;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public String getTime() {
+        return time;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setTime(String time) {
+        this.time = time;
     }
 }

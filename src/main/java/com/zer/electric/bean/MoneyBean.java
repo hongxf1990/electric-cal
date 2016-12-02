@@ -1,21 +1,16 @@
 package com.zer.electric.bean;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import java.util.Date;
-
 /**
- * @author zer
+ * @author hongxf
  * @create 2016-11-28 14:41
  */
 public class MoneyBean {
     private Double hxf;
     private Double jx;
     private Double wc;
-    private Double totalOfBill;
+    private Double totalOfPay;
+    private String time;
 
-    @JsonFormat(pattern="MM/yyyy", timezone="Asia/Shanghai")
-    private Date createTime;
 
     public Double getHxf() {
         return hxf;
@@ -41,19 +36,19 @@ public class MoneyBean {
         this.wc = wc;
     }
 
-    public Double getTotalOfBill() {
-        return totalOfBill;
+    public Double getTotalOfPay() {
+        return totalOfPay;
     }
 
-    public void setTotalOfBill(Double totalOfBill) {
-        this.totalOfBill = totalOfBill;
+    public void setTotalOfPay(Double totalOfPay) {
+        this.totalOfPay = totalOfPay;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public String getTime() {
+        return time;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setTime(String time) {
+        this.time = time;
     }
 }

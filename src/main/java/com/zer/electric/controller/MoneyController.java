@@ -1,17 +1,17 @@
 package com.zer.electric.controller;
 
 import com.zer.electric.bean.MoneyBean;
-import com.zer.electric.utils.Mysql.JdbcHelper;
+import com.zer.electric.utils.Pool;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Pipeline;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * @author zer
@@ -24,28 +24,19 @@ public class MoneyController {
     @RequestMapping(value = "/recent-pays", method = RequestMethod.GET)
     public List<MoneyBean> findRecentPay() {
         List<MoneyBean> list = new ArrayList<>();
-        String sql = "select * from money order by createTime desc";
-
-        try {
-            List<Map<String, Object>> queryList = JdbcHelper.query(sql);
-            for (Map<String, Object> map: queryList) {
+        try(Jedis conn = Pool.getPool().getResource()) {
+            Pipeline pipe = conn.pipelined();
+            Set<String> moneySet = pipe.zrevrange("money:", 0, -1).get();
+            for (String moneyId : moneySet) {
                 MoneyBean moneyBean = new MoneyBean();
-                Double hxf = (Double) map.get("hxf");
-                Double wc = (Double) map.get("wc");
-                Double jx = (Double) map.get("jx");
-                Double totalOfBill = (Double) map.get("totalOfBill");
-                Date time = (Date) map.get("createTime");
-                moneyBean.setHxf(hxf);
-                moneyBean.setWc(wc);
-                moneyBean.setJx(jx);
-                moneyBean.setTotalOfBill(totalOfBill);
-                moneyBean.setCreateTime(time);
+                moneyBean.setTime(moneyId.substring(moneyId.indexOf(":") + 1));
+                moneyBean.setHxf(Double.valueOf(pipe.hget(moneyId, "hxf").get()));
+                moneyBean.setJx(Double.valueOf(pipe.hget(moneyId, "jx").get()));
+                moneyBean.setWc(Double.valueOf(pipe.hget(moneyId, "wc").get()));
+                moneyBean.setTotalOfPay(Double.valueOf(pipe.hget(moneyId, "totalOfPay").get()));
                 list.add(moneyBean);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-
         return list;
     }
 }
