@@ -5,42 +5,42 @@ package com.zer.electric.bean;
  * @create 2016-11-28 14:41
  */
 public class MoneyBean {
-    private Double hxf;
-    private Double jx;
-    private Double wc;
-    private Double totalOfPay;
+    private String hxf;
+    private String jx;
+    private String wc;
+    private String totalOfPay;
     private String time;
 
 
-    public Double getHxf() {
+    public String getHxf() {
         return hxf;
     }
 
-    public void setHxf(Double hxf) {
+    public void setHxf(String hxf) {
         this.hxf = hxf;
     }
 
-    public Double getJx() {
+    public String getJx() {
         return jx;
     }
 
-    public void setJx(Double jx) {
+    public void setJx(String jx) {
         this.jx = jx;
     }
 
-    public Double getWc() {
+    public String getWc() {
         return wc;
     }
 
-    public void setWc(Double wc) {
+    public void setWc(String wc) {
         this.wc = wc;
     }
 
-    public Double getTotalOfPay() {
+    public String getTotalOfPay() {
         return totalOfPay;
     }
 
-    public void setTotalOfPay(Double totalOfPay) {
+    public void setTotalOfPay(String totalOfPay) {
         this.totalOfPay = totalOfPay;
     }
 

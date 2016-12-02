@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.Pipeline;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -42,9 +42,9 @@ public class ElectricController {
         }
         try(Jedis conn = Pool.getPool().getResource()) {
             //获取上一个月的各自电表度数
-            Pipeline pipe = conn.pipelined();
+//            Pipeline pipe = conn.pipelined();
             //key：money:1/2016
-            Map<String, String> beforeMonthElec = pipe.hgetAll("money:" + beforeMonth + "/" + beforeYear).get();
+            Map<String, String> beforeMonthElec = conn.hgetAll("electric:" + beforeMonth + "/" + beforeYear);
             if (!beforeMonthElec.isEmpty()) { //如果不是第一次
                 //上个月的度数
                 Double hxfBefore = Double.parseDouble(beforeMonthElec.get("hxf"));
@@ -62,13 +62,13 @@ public class ElectricController {
                 eleMap.put("wc", String.valueOf(wcElec));
                 eleMap.put("pub", String.valueOf(pubElec));
                 eleMap.put("totalOfElectric", String.valueOf(totalOfElectric));
-                pipe.hmset("money:" + currentMonth + "/" + currentYear, eleMap);
-                //存储有哪些money键
-                pipe.zadd("money:", calendar.getTimeInMillis(), "money:" + currentMonth + "/" + currentYear);
+                conn.hmset("electric:" + currentMonth + "/" + currentYear, eleMap);
+                //存储有哪些electric键
+                conn.zadd("electric:", calendar.getTimeInMillis(), "electric:" + currentMonth + "/" + currentYear);
                 //存储费用
                 Map<String, String> payMap = calPay(hxfElec, jxElec, wcElec, pubElec, totalOfElectric, totalOfPay);
-                pipe.hmset("electric:" + currentMonth + "/" + currentYear, payMap);
-                pipe.zadd("electric:", calendar.getTimeInMillis(), "electric:" + currentMonth + "/" + currentYear);
+                conn.hmset("money:" + currentMonth + "/" + currentYear, payMap);
+                conn.zadd("money:", calendar.getTimeInMillis(), "money:" + currentMonth + "/" + currentYear);
             } else {
                 //存储第一个月的电度数，假设电表为0
                 Double pubElec = totalOfElectric - hxfCurrent - jxCurrent - wcCurrent;
@@ -78,23 +78,21 @@ public class ElectricController {
                 eleMap.put("wc", String.valueOf(wcCurrent));
                 eleMap.put("pub", String.valueOf(pubElec));
                 eleMap.put("totalOfElectric", String.valueOf(totalOfElectric));
-                pipe.hmset("money:" + currentMonth + "/" + currentYear, eleMap);
+                conn.hmset("electric:" + currentMonth + "/" + currentYear, eleMap);
                 //存储有哪些money键
-                pipe.zadd("money:", calendar.getTimeInMillis(), "money:" + currentMonth + "/" + currentYear);
+                conn.zadd("electric:", calendar.getTimeInMillis(), "electric:" + currentMonth + "/" + currentYear);
                 //存储费用
                 Map<String, String> payMap = calPay(hxfCurrent, jxCurrent, wcCurrent, pubElec, totalOfElectric, totalOfPay);
-                pipe.hmset("electric:" + currentMonth + "/" + currentYear, payMap);
-                pipe.zadd("electric:", calendar.getTimeInMillis(), "electric:" + currentMonth + "/" + currentYear);
-            }
-            List<Object> result = pipe.exec().get();
-            if (result != null) {
-                json.setSuccess(true);
-                json.setMsg("计算费用成功");
-            } else {
-                json.setSuccess(false);
-                json.setMsg("计算费用失败");
+                conn.hmset("money:" + currentMonth + "/" + currentYear, payMap);
+                conn.zadd("money:", calendar.getTimeInMillis(), "money:" + currentMonth + "/" + currentYear);
             }
 
+            json.setSuccess(true);
+            json.setMsg("计算费用成功");
+
+        } catch (Exception e) {
+            json.setSuccess(false);
+            json.setMsg("计算费用失败");
         }
         return json;
     }
@@ -117,17 +115,18 @@ public class ElectricController {
     public List<ElectricNumBean> getRecentElec() {
         List<ElectricNumBean> list = new ArrayList<>();
         try(Jedis conn = Pool.getPool().getResource()) {
-            Pipeline pipe = conn.pipelined();
-            Set<String> elecSet = pipe.zrevrange("electric:", 0, -1).get();
+//            Pipeline pipe = conn.pipelined();
+            DecimalFormat df = new DecimalFormat(".0");
+            Set<String> elecSet = conn.zrevrange("electric:", 0, -1);
             for (String elecId : elecSet) {
                 ElectricNumBean electricNumBean = new ElectricNumBean();
                 String monthAndYear = elecId.substring(elecId.indexOf(":") + 1);
                 electricNumBean.setTime(monthAndYear);
-                electricNumBean.setHxf(Double.valueOf(pipe.hget(elecId, "hxf").get()));
-                electricNumBean.setJx(Double.valueOf(pipe.hget(elecId, "jx").get()));
-                electricNumBean.setWc(Double.valueOf(pipe.hget(elecId, "wc").get()));
-                electricNumBean.setPub(Double.valueOf(pipe.hget(elecId, "pub").get()));
-                electricNumBean.setTotalOfElec(Double.valueOf(pipe.hget(elecId, "totalOfElectric").get()));
+                electricNumBean.setHxf(df.format(Double.valueOf(conn.hget(elecId, "hxf"))));
+                electricNumBean.setJx(df.format(Double.valueOf(conn.hget(elecId, "jx"))));
+                electricNumBean.setWc(df.format(Double.valueOf(conn.hget(elecId, "wc"))));
+                electricNumBean.setPub(df.format(Double.valueOf(conn.hget(elecId, "pub"))));
+                electricNumBean.setTotalOfElec(df.format(Double.valueOf(conn.hget(elecId, "totalOfElectric"))));
                 list.add(electricNumBean);
             }
         }

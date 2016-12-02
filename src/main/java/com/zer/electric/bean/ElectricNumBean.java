@@ -5,51 +5,50 @@ package com.zer.electric.bean;
  * @create 2016-11-28 15:31
  */
 public class ElectricNumBean {
-    private Double hxf;
-    private Double wc;
-    private Double jx;
-    private Double pub;
-    private Double totalOfElec;
-
+    private String hxf;
+    private String wc;
+    private String jx;
+    private String pub;
+    private String totalOfElec;
     private String time;
 
-    public Double getHxf() {
+    public String getHxf() {
         return hxf;
     }
 
-    public void setHxf(Double hxf) {
+    public void setHxf(String hxf) {
         this.hxf = hxf;
     }
 
-    public Double getWc() {
+    public String getWc() {
         return wc;
     }
 
-    public void setWc(Double wc) {
+    public void setWc(String wc) {
         this.wc = wc;
     }
 
-    public Double getJx() {
+    public String getJx() {
         return jx;
     }
 
-    public void setJx(Double jx) {
+    public void setJx(String jx) {
         this.jx = jx;
     }
 
-    public Double getPub() {
+    public String getPub() {
         return pub;
     }
 
-    public void setPub(Double pub) {
+    public void setPub(String pub) {
         this.pub = pub;
     }
 
-    public Double getTotalOfElec() {
+    public String getTotalOfElec() {
         return totalOfElec;
     }
 
-    public void setTotalOfElec(Double totalOfElec) {
+    public void setTotalOfElec(String totalOfElec) {
         this.totalOfElec = totalOfElec;
     }
 
