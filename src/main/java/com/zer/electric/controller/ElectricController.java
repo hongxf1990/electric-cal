@@ -33,7 +33,7 @@ public class ElectricController {
         //获取当前月份，取得前一个月份
         Calendar calendar = Calendar.getInstance();
         int currentYear = calendar.get(Calendar.YEAR);
-        int currentMonth = calendar.get(Calendar.MONTH);
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
         int beforeMonth = currentMonth - 1;
         int beforeYear = currentYear;
         if (beforeMonth == 0) {
